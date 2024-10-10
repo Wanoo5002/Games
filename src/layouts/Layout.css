@@ -1,0 +1,62 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+:root {
+    --accent: 136, 58, 234;
+    --accent-light: 224, 204, 250;
+    --accent-dark: 49, 10, 101;
+    --accent-gradient: linear-gradient(
+        45deg,
+        rgb(var(--accent)),
+        rgb(var(--accent-light)) 30%,
+        white 60%
+    );
+}
+
+html {
+    font-family: system-ui, sans-serif;
+    background: #ffffff;
+    font-size: 1vmin;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+code {
+    font-family:
+        Menlo,
+        Monaco,
+        Lucida Console,
+        Liberation Mono,
+        DejaVu Sans Mono,
+        Bitstream Vera Sans Mono,
+        Courier New,
+        monospace;
+}
+
+a {
+    text-decoration: none;
+    color: #0f7afc;
+}
+
+header {
+    display: flex;
+    background-color: yellow;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+}
+
+header * {
+    padding: 1rem;
+    font-size: large;
+}
+
+main {
+    flex-grow: 1;
+}

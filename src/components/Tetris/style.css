@@ -1,0 +1,13 @@
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+  
+  body {
+    margin: 0;
+    font-family: Consolas;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  

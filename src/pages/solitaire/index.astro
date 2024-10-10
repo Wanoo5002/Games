@@ -1,9 +1,11 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-import { App } from "../../components/preferans/App"
+import { App } from "../../components/solitaire/App.jsx"
 import "./style.css"
+
+
 ---
 
 <Layout title="Preferans">
-    <App client:load />
+    <App client:only="react" />
 </Layout>
