@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Voice Chat</title>
+</head>
+<body>
+    <h1>Simple Voice Chat</h1>
+    <button id="startCall">Start Call</button>
+    <button id="endCall" disabled>End Call</button>
+
+    <script>
+        const startCallButton = document.getElementById('startCall');
+        const endCallButton = document.getElementById('endCall');
+
+        const signalingServer = new WebSocket('ws://5.39.249.21:8080');
+        let localStream;
+        let peerConnection;
+
+        const configuration = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }, 
+            { urls: 'turn:openrelay.me:80', username: 'openrelay', credential: 'openrelay' }],
+            sdpSemantics: 'unified-plan'
+        };
+
+        startCallButton.onclick = async () => {
+            localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            peerConnection = new RTCPeerConnection(configuration);
+
+            localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
+
+            peerConnection.onicecandidate = event => {
+                if (event.candidate) {
+                    signalingServer.send(JSON.stringify({ 'ice': event.candidate }));
+                }
+            };
+
+            peerConnection.ontrack = event => {
+                const audio = new Audio();
+                audio.srcObject = event.streams[0];
+                audio.play();
+            };
+
+            const offer = await peerConnection.createOffer();
+            await peerConnection.setLocalDescription(offer);
+            signalingServer.send(JSON.stringify({ 'sdp': offer }));
+        };
+
+        signalingServer.onmessage = async (message) => {
+            const data = JSON.parse(await message.data.text());
+            
+            console.log(data)
+
+            if (data.sdp) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.sdp));
+                if (data.sdp.type === 'offer') {
+                    const answer = await peerConnection.createAnswer();
+                    await peerConnection.setLocalDescription(answer);
+                    signalingServer.send(JSON.stringify({ 'sdp': answer }));
+                }
+            } else if (data.ice) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.ice));
+            }
+        };
+
+        endCallButton.onclick = () => {
+            peerConnection.close();
+            localStream.getTracks().forEach(track => track.stop());
+        };
+    </script>
+</body>
+</html>
